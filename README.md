@@ -1,5 +1,5 @@
 # BTL-HDGN
-CONFIG.IN
+# CONFIG.IN
 config BR2_PACKAGE_MY_BUTTON
     bool "my_button"
     depends on BR2_LINUX_KERNEL
@@ -21,7 +21,7 @@ endef
 $(eval $(kernel-module))
 $(eval $(generic-package))
 
-Src/My_button.c 
+# Src/My_button.c 
 #include <linux/module.h>
 #include <linux/init.h>
 #include <linux/fs.h>
