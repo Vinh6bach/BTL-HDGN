@@ -1,11 +1,19 @@
-# BTL-HDGN
-# CONFIG.IN
+```markdown
+### 1. File `Config.in`
+```kconfig
 config BR2_PACKAGE_MY_BUTTON
     bool "my_button"
     depends on BR2_LINUX_KERNEL
     help
       Kernel module for single Button using Interrupt on P9_15 (GPIO 48).
- My_button.mk
+
+```
+
+---
+
+### 2. File `my_button.mk`
+
+```make
 MY_BUTTON_VERSION = 1.0
 MY_BUTTON_SITE = $(TOPDIR)/package/my_button/src
 MY_BUTTON_SITE_METHOD = local
@@ -21,7 +29,13 @@ endef
 $(eval $(kernel-module))
 $(eval $(generic-package))
 
-# Src/My_button.c 
+```
+
+---
+
+### 3. File `src/my_button.c`
+
+```c
 #include <linux/module.h>
 #include <linux/init.h>
 #include <linux/fs.h>
@@ -47,7 +61,8 @@ static DECLARE_WAIT_QUEUE_HEAD(wait_queue);
 static unsigned long last_jiffies = 0;
 
 // Hàm xử lý ngắt khi nhấn/nhả nút
-static irqreturn_t button_irq_handler(int irq, void *dev_id) {
+static irqreturn_t button_irq_handler(int irq, void *dev_id)
+{
     int state; // C90: Biến phải nằm trên cùng của hàm
 
     // Chống dội phím (Debounce) 200ms
@@ -72,7 +87,7 @@ static ssize_t dev_read(struct file *filep, char __user *buffer, size_t len, lof
     out_state = button_state;
     data_ready = false;
     
-    if (copy_to_user(buffer, &out_state, 1) != 0)//so luong byte chua copy dc -0/1
+    if (copy_to_user(buffer, &out_state, 1) != 0) // số lượng byte chưa copy được
         return -EFAULT;
         
     return 1;
@@ -138,8 +153,14 @@ module_exit(button_exit);
 
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("Interrupt-driven Button Driver on P9_15");
-  Src/MAKEFILE
 
+```
+
+---
+
+### 4. File `src/Makefile`
+
+```make
 obj-m += my_button.o
 
 all:
@@ -147,8 +168,14 @@ all:
 
 clean:
 	$(MAKE) -C $(LINUX_DIR) M=$(PWD) clean
-Cấu hình pinmux 
-nano output/build/linux-custom/arch/arm/boot/dts/am335x-boneblack.dts
+
+```
+
+---
+
+### 5. File `am335x-boneblack.dts` (Device Tree)
+
+```dts
 /* ----------- CAU HINH PINMUX NÚT NHẤN (P9_15) ----------- */
 &am33xx_pinmux {
     button_pins: pinmux_button_pins {
@@ -168,3 +195,9 @@ nano output/build/linux-custom/arch/arm/boot/dts/am335x-boneblack.dts
     };
 };
 /* -------------------------------------------------------- */
+
+```
+
+```
+
+```
